@@ -1,0 +1,3 @@
+streamlit
+pandas
+h2o
