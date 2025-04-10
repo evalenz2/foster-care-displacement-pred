@@ -3,5 +3,4 @@ h2o
 pandas
 numpy
 scikit-learn
-# Java (Render uses Debian under the hood)
 openjdk-11-jdk
