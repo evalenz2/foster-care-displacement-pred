@@ -16,9 +16,18 @@ with open("feature_names.json") as f:
 # Load SHAP explainer
 explainer = joblib.load("shap_explainer.pkl")
 
-# Categorical options mapping
+# Categorical options mapping (expanded for clarity in UI)
 categorical_options = {
     "SEX": {"Male": 1, "Female": 2},
+    "RaceEthn": {
+        "White": 1,
+        "Black or African American": 2,
+        "Hispanic": 3,
+        "American Indian or Alaska Native": 4,
+        "Asian": 5,
+        "Two or More Races": 6,
+        "Unknown/Other": 7
+    },
     "HISORGIN": {"No": 0, "Yes": 1},
     "PHYABUSE": {"No": 0, "Yes": 1},
     "SEXABUSE": {"No": 0, "Yes": 1},
@@ -30,6 +39,23 @@ categorical_options = {
     "ABANDMNT": {"No": 0, "Yes": 1},
     "RELINQSH": {"No": 0, "Yes": 1},
     "HOUSING": {"No": 0, "Yes": 1},
+    "AAPARENT": {"No": 0, "Yes": 1, "Yes, Adoptive Mother Present": 2},
+    "DAPARENT": {"No": 0, "Yes": 1, "Yes, Adoptive Father Present": 2},
+    "AACHILD": {"No": 0, "Yes": 1},
+    "DACHILD": {"No": 0, "Yes": 1},
+    "CHILDIS": {"No": 0, "Yes": 1},
+    "CLINDIS": {"No": 0, "Yes": 1},
+    "MR": {"No": 0, "Yes": 1},
+    "VISHEAR": {"No": 0, "Yes": 1},
+    "PHYDIS": {"No": 0, "Yes": 1},
+    "OTHERMED": {"No": 0, "Yes": 1},
+    "PRTSDIED": {"No": 0, "Yes": 1},
+    "IsWaiting": {"No": 0, "Yes": 1, "Waiting Category 2": 2},
+    "IVEFC": {"No": 0, "Yes": 1},
+    "IVAAFDC": {"No": 0, "Yes": 1},
+    "XIXMEDCD": {"No": 0, "Yes": 1},
+    "PLACEOUT": {"No": 0, "Yes": 1},
+    "IsTPR": {"No": 0, "Yes": 1},
     "CURPLSET": {
         "Pre-Adoptive Home": 1,
         "Foster Family Home (Relative)": 2,
