@@ -158,21 +158,21 @@ if submitted:
         st.write(f"**Prediction (Threshold = {threshold}):** {'Displaced' if pred else 'Stable'}")
 
         # SHAP Explanation
-        st.subheader("Explanation of Prediction:")
-        shap_values = explainer(user_df)
-        st.set_option("deprecation.showPyplotGlobalUse", False)
-
-        shap_values_df = pd.DataFrame({
-            'feature': [field_labels.get(f, f) for f in feature_names],
-            'importance': np.abs(shap_values.values[0])
-        }).sort_values(by='importance', ascending=False)
-
-        plt.figure(figsize=(10, 12))
-        plt.barh(shap_values_df['feature'], shap_values_df['importance'])
-        plt.xlabel("SHAP Value (Impact)")
-        plt.title("Feature Contributions to Prediction")
-        plt.gca().invert_yaxis()
-        st.pyplot()
+         st.subheader("Explanation of Prediction:")
+         shap_values = explainer(user_df)
+         st.set_option("deprecation.showPyplotGlobalUse", False)
+         plt.figure(figsize=(10, 12))
+         shap.plots.bar(shap_values, max_display=len(feature_names), show=False)
+         shap_values_df = pd.DataFrame({
+     'feature': [field_labels.get(f, f) for f in feature_names],
+     'importance': np.abs(shap_values.values[0])
+ }).sort_values(by='importance', ascending=False)
+ 
+ plt.barh(shap_values_df['feature'], shap_values_df['importance'])
+ plt.xlabel("SHAP Value (Impact)")
+ plt.title("Feature Contributions to Prediction")
+ plt.gca().invert_yaxis()
+         st.pyplot()
 
         # Additional SHAP Plots
         st.subheader("SHAP Waterfall Plot (Top 15 Features)")
