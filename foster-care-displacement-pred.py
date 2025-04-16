@@ -16,7 +16,7 @@ with open("feature_names.json") as f:
 # Load SHAP explainer
 explainer = joblib.load("shap_explainer.pkl")
 
-# Categorical options mapping (expanded for clarity in UI)
+# Categorical options mapping
 categorical_options = {
     "SEX": {"Male": 1, "Female": 2},
     "RaceEthn": {
@@ -78,7 +78,7 @@ categorical_options = {
     }
 }
 
-# Translated labels for form display
+# Translated labels for the form
 field_labels = {
     "SEX": "Sex",
     "AgeAtStart": "Age at Start",
@@ -160,35 +160,33 @@ if submitted:
         # SHAP Explanation
         st.subheader("Explanation of Prediction:")
         shap_values = explainer(user_df)
-        st.set_option("deprecation.showPyplotGlobalUse", False)
-        plt.figure(figsize=(10, 12))
+
         shap_values_df = pd.DataFrame({
-    'feature': [field_labels.get(f, f) for f in feature_names],
-    'importance': np.abs(shap_values.values[0])
-}).sort_values(by='importance', ascending=False)
+            'feature': [field_labels.get(f, f) for f in feature_names],
+            'importance': np.abs(shap_values.values[0])
+        }).sort_values(by='importance', ascending=False)
 
         fig, ax = plt.subplots(figsize=(10, 12))
-                ax.barh(shap_values_df['feature'], shap_values_df['importance'])
+        ax.barh(shap_values_df['feature'], shap_values_df['importance'])
         ax.set_xlabel("SHAP Value (Impact)")
         ax.set_title("Feature Contributions to Prediction")
         ax.invert_yaxis()
-        st.pyplot()
+        st.pyplot(fig)
 
-        # Additional SHAP Plots
+        # SHAP Waterfall Plot
         st.subheader("SHAP Waterfall Plot (Top 15 Features)")
-        st.set_option("deprecation.showPyplotGlobalUse", False)
-        shap.plots.waterfall(shap_values[0], max_display=15, show=False)
+        fig2 = shap.plots.waterfall(shap_values[0], max_display=15, show=False)
         st.pyplot()
 
+        # SHAP Force Plot
         st.subheader("SHAP Force Plot (Single Prediction)")
         shap_values_for_force = shap.Explanation(
-    values=shap_values.values[0],
-    base_values=shap_values.base_values[0],
-    data=user_df.values[0],
-    feature_names=[field_labels.get(f, f) for f in feature_names]
-)
-st_shap_html = shap.plots.force(shap_values_for_force, matplotlib=False).html()
-        st.components.v1.html(st_shap_html, height=300, scrolling=True)
+            values=shap_values.values[0],
+            base_values=shap_values.base_values[0],
+            data=user_df.values[0],
+            feature_names=[field_labels.get(f, f) for f in feature_names]
+        )
+        st.components.v1.html(shap.plots.force(shap_values_for_force, matplotlib=False).html(), height=300, scrolling=True)
 
     except Exception as e:
         st.error(f"Something went wrong: {e}")
