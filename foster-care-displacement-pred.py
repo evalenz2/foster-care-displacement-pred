@@ -161,27 +161,28 @@ if submitted:
         st.subheader("Explanation of Prediction:")
         shap_values = explainer(user_df)
         st.set_option("deprecation.showPyplotGlobalUse", False)
-        plt.figure(figsize=(10, 12))
-        shap_values_df = pd.DataFrame({
-    'feature': [field_labels.get(f, f) for f in feature_names],
-    'importance': np.abs(shap_values.values[0])
-}).sort_values(by='importance', ascending=False)
 
-plt.barh(shap_values_df['feature'], shap_values_df['importance'])
-plt.xlabel("SHAP Value (Impact)")
-plt.title("Feature Contributions to Prediction")
-plt.gca().invert_yaxis()
+        shap_values_df = pd.DataFrame({
+            'feature': [field_labels.get(f, f) for f in feature_names],
+            'importance': np.abs(shap_values.values[0])
+        }).sort_values(by='importance', ascending=False)
+
+        plt.figure(figsize=(10, 12))
+        plt.barh(shap_values_df['feature'], shap_values_df['importance'])
+        plt.xlabel("SHAP Value (Impact)")
+        plt.title("Feature Contributions to Prediction")
+        plt.gca().invert_yaxis()
         st.pyplot()
 
         # Additional SHAP Plots
         st.subheader("SHAP Waterfall Plot (Top 15 Features)")
-        st.set_option("deprecation.showPyplotGlobalUse", False)
         shap.plots.waterfall(shap_values[0], max_display=15, show=False)
         st.pyplot()
 
         st.subheader("SHAP Force Plot (Single Prediction)")
         st_shap_html = shap.plots.force(shap_values[0], matplotlib=False)
         st.components.v1.html(st_shap_html, height=300, scrolling=True)
+
 
     except Exception as e:
         st.error(f"Something went wrong: {e}")
