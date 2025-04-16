@@ -176,11 +176,18 @@ if submitted:
 
         # Additional SHAP Plots
         st.subheader("SHAP Waterfall Plot (Top 15 Features)")
+        st.set_option("deprecation.showPyplotGlobalUse", False)
         shap.plots.waterfall(shap_values[0], max_display=15, show=False)
         st.pyplot()
 
         st.subheader("SHAP Force Plot (Single Prediction)")
-        st_shap_html = shap.plots.force(shap_values[0], matplotlib=False)
+        shap_values_for_force = shap.Explanation(
+    values=shap_values.values[0],
+    base_values=shap_values.base_values[0],
+    data=user_df.values[0],
+    feature_names=[field_labels.get(f, f) for f in feature_names]
+)
+st_shap_html = shap.plots.force(shap_values_for_force, matplotlib=False)
         st.components.v1.html(st_shap_html, height=300, scrolling=True)
 
 
