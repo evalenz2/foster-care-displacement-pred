@@ -1,6 +1,8 @@
-streamlit
-h2o
-pandas
-numpy
-scikit-learn
-openjdk-11-jdk
+streamlit==1.32.2
+pandas==1.5.3
+numpy==1.24.4
+scikit-learn==1.3.2
+matplotlib==3.7.3
+shap==0.44.1
+xgboost==1.7.6
+joblib==1.3.2
