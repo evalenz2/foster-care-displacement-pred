@@ -1,55 +1,142 @@
 import streamlit as st
-import h2o
-from h2o.estimators import H2OGradientBoostingEstimator
 import pandas as pd
+import joblib
+import json
+import shap
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Initialize H2O
-h2o.init()
+# Load model and threshold
+model = joblib.load("foster_model.pkl")
+with open("model_threshold.json") as f:
+    threshold = json.load(f)['threshold']
+with open("feature_names.json") as f:
+    feature_names = json.load(f)
 
-# Load the trained model
-model_path = "./Grid_GBM_py_11_sid_8652_model_python_1744321074497_443_model_5"  # Update if your repo structure changes
-model = h2o.load_model(model_path)
+# Load SHAP explainer
+explainer = joblib.load("shap_explainer.pkl")
 
-# Define features (ensure the order matches training)
-features = [
-    'sex', 'ageatstart', 'phyabuse', 'sexabuse', 'neglect', 'chbehprb',
-    'prtsjail', 'nocope', 'abandmnt', 'relinqsh', 'housing', 'curplset',
-    'placeout', 'casegoal', 'raceethn', 'hisorgin', 'emotdist'
-]
+# Categorical options mapping
+categorical_options = {
+    "SEX": {"Male": 1, "Female": 2},
+    "HISORGIN": {"No": 0, "Yes": 1},
+    "PHYABUSE": {"No": 0, "Yes": 1},
+    "SEXABUSE": {"No": 0, "Yes": 1},
+    "NEGLECT": {"No": 0, "Yes": 1},
+    "CHBEHPRB": {"No": 0, "Yes": 1},
+    "EmotDist": {"No": 0, "Yes": 1},
+    "PRTSJAIL": {"No": 0, "Yes": 1},
+    "NOCOPE": {"No": 0, "Yes": 1},
+    "ABANDMNT": {"No": 0, "Yes": 1},
+    "RELINQSH": {"No": 0, "Yes": 1},
+    "HOUSING": {"No": 0, "Yes": 1},
+    "CURPLSET": {
+        "Pre-Adoptive Home": 1,
+        "Foster Family Home (Relative)": 2,
+        "Foster Family Home (Non-Relative)": 3,
+        "Group Home": 4,
+        "Institution": 5,
+        "Supervised Independent Living": 6,
+        "Runaway": 7,
+        "Trial Home Visit": 8,
+        "Other": 9
+    },
+    "CASEGOAL": {
+        "Reunify with Parent(s)/Caretaker(s)": 1,
+        "Live with Other Relatives": 2,
+        "Adoption": 3,
+        "Long-Term Foster Care": 4,
+        "Emancipation": 5,
+        "Guardianship": 6,
+        "Case Plan Goal Not Yet Established": 7
+    }
+}
 
-st.title("Foster Care Displacement Risk Predictor")
-st.write("Enter the child's information to predict risk of displacement.")
+# Translated labels for form display
+field_labels = {
+    "SEX": "Sex",
+    "AgeAtStart": "Age at Start",
+    "HISORGIN": "Hispanic Origin",
+    "RaceEthn": "Race/Ethnicity",
+    "PHYABUSE": "Physical Abuse",
+    "SEXABUSE": "Sexual Abuse",
+    "NEGLECT": "Neglect",
+    "AAPARENT": "Adoptive Mother Present",
+    "DAPARENT": "Adoptive Father Present",
+    "AACHILD": "Child Asked for Adoption",
+    "DACHILD": "Child Denied Adoption",
+    "CHILDIS": "Child Disability",
+    "CHBEHPRB": "Behavioral Problems",
+    "EmotDist": "Emotional Disturbance",
+    "CLINDIS": "Clinically Diagnosed Disability",
+    "MR": "Mental Retardation",
+    "VISHEAR": "Visual/Hearing Impairment",
+    "PHYDIS": "Physical Disability",
+    "OTHERMED": "Other Medical Condition",
+    "PRTSDIED": "Parent(s) Deceased",
+    "PRTSJAIL": "Parent(s) Incarcerated",
+    "NOCOPE": "Parents Unable to Cope",
+    "ABANDMNT": "Abandonment",
+    "RELINQSH": "Relinquishment",
+    "HOUSING": "Inadequate Housing",
+    "CASEGOAL": "Case Goal",
+    "CURPLSET": "Current Placement Setting",
+    "PLACEOUT": "Placed Out of Home",
+    "IsTPR": "Termination of Parental Rights",
+    "IsWaiting": "Is Waiting for Adoption",
+    "IVEFC": "IV-E Foster Care Eligible",
+    "IVAAFDC": "IV-A/AFDC Eligible",
+    "XIXMEDCD": "Medicaid Eligible"
+}
 
-# User inputs
+st.set_page_config(page_title="Foster Care Displacement Predictor", layout="centered")
+st.title("🧒 Foster Care Displacement Risk Predictor")
+
+st.markdown("""
+This tool uses a machine learning model trained on historical foster care data to help predict the likelihood of a child experiencing multiple placements (displacement) in the foster care system. 
+
+**What does the prediction mean?**
+- The model outputs a probability between 0 and 1.
+- If that probability is **greater than 0.32**, the model predicts the child is at risk of displacement.
+- This tool is designed to help social workers and case managers flag potentially unstable placements early.
+
+The model prioritizes **recall**, meaning it aims to catch as many true displacement cases as possible—even if it means some false alarms.
+""")
+
+st.markdown("Fill in the child-specific information below to estimate the risk of future displacement.")
+
+# User input form
 input_data = {}
-for feat in features:
-    if feat in ['sex', 'phyabuse', 'sexabuse', 'neglect', 'chbehprb', 'prtsjail', 'nocope', 'abandmnt', 'relinqsh', 'housing', 'emotdist']:
-        input_data[feat] = st.selectbox(f"{feat}", options=[0, 1])
-    elif feat in ['curplset', 'placeout', 'casegoal', 'raceethn']:
-        input_data[feat] = st.number_input(f"{feat} (code)", min_value=0, step=1)
-    elif feat == 'hisorgin':
-        input_data[feat] = st.selectbox(f"{feat} (Hispanic Origin)", options=[0, 1])
-    else:
-        input_data[feat] = st.number_input(f"{feat}", step=1.0)
+with st.form("input_form"):
+    for feature in feature_names:
+        label = field_labels.get(feature, feature)
+        if feature in categorical_options:
+            options = list(categorical_options[feature].keys())
+            selected = st.selectbox(label, options)
+            input_data[feature] = categorical_options[feature][selected]
+        else:
+            input_data[feature] = st.number_input(label, value=0)
+    submitted = st.form_submit_button("Predict")
 
-# Convert to H2OFrame
-if st.button("Predict Displacement Risk"):
-    input_df = pd.DataFrame([input_data])
-    h2o_df = h2o.H2OFrame(input_df)
+if submitted:
+    try:
+        # Create DataFrame
+        user_df = pd.DataFrame([input_data])
 
-    prediction = model.predict(h2o_df).as_data_frame()
-    risk = prediction["predict"][0]
-    prob = prediction["p1"][0]
+        # Predict
+        prob = model.predict_proba(user_df)[:, 1][0]
+        pred = int(prob >= threshold)
 
-    st.subheader(f"Prediction: {'Displaced' if risk == 1 else 'Not Displaced'}")
-    st.write(f"Probability of displacement: **{prob:.2%}**")
+        st.subheader("Prediction Result:")
+        st.write(f"**Probability of displacement:** {prob:.2%}")
+        st.write(f"**Prediction (Threshold = {threshold}):** {'Displaced' if pred else 'Stable'}")
 
-    # Optional explanation
-    if st.checkbox("Show Feature Importance (Optional)"):
-        try:
-            imp = model.varimp(use_pandas=True)
-            st.subheader("Top Important Features")
-            st.dataframe(imp[['variable', 'percentage']].head(10))
-        except:
-            st.warning("Feature importance is not available for this model.")
+        # SHAP Explanation
+        st.subheader("Explanation of Prediction:")
+        shap_values = explainer(user_df)
+        fig, ax = plt.subplots()
+        shap.plots.waterfall(shap_values[0], show=False)
+        st.pyplot(fig)
 
+    except Exception as e:
+        st.error(f"Something went wrong: {e}")
