@@ -166,3 +166,45 @@ if submitted:
 
     except Exception as e:
         st.error(f"Something went wrong: {e}")
+
+# Feature Explanation Table
+st.subheader("📘 Variable Reference Table")
+
+explanation_data = [
+    {"Raw Name": "SEX", "Español": "Sexo", "English": "Sex", "Options": "1 = Male, 2 = Female"},
+    {"Raw Name": "AgeAtStart", "Español": "Edad al entrar", "English": "Age at Start", "Options": "Numeric (years)"},
+    {"Raw Name": "HISORGIN", "Español": "Origen Hispano", "English": "Hispanic Origin", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "RaceEthn", "Español": "Raza / Etnia", "English": "Race / Ethnicity", "Options": "1 = White, 2 = Black, 3 = Hispanic, 4 = Native American, 5 = Asian, 6 = Two or More Races, 7 = Other/Unknown"},
+    {"Raw Name": "PHYABUSE", "Español": "Abuso físico", "English": "Physical Abuse", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "SEXABUSE", "Español": "Abuso sexual", "English": "Sexual Abuse", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "NEGLECT", "Español": "Negligencia", "English": "Neglect", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "AAPARENT", "Español": "Madre adoptiva", "English": "Adoptive Mother Present", "Options": "0 = No, 1 = Yes, 2 = Present"},
+    {"Raw Name": "DAPARENT", "Español": "Padre adoptivo", "English": "Adoptive Father Present", "Options": "0 = No, 1 = Yes, 2 = Present"},
+    {"Raw Name": "AACHILD", "Español": "Niño pidió adopción", "English": "Child Asked for Adoption", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "DACHILD", "Español": "Niño rechazó adopción", "English": "Child Denied Adoption", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "CHILDIS", "Español": "Discapacidad infantil", "English": "Child Disability", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "CHBEHPRB", "Español": "Problemas de comportamiento", "English": "Behavioral Problems", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "EmotDist", "Español": "Trastorno emocional", "English": "Emotional Disturbance", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "CLINDIS", "Español": "Discapacidad clínica", "English": "Clinically Diagnosed Disability", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "MR", "Español": "Retraso mental", "English": "Mental Retardation", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "VISHEAR", "Español": "Discapacidad visual/auditiva", "English": "Visual/Hearing Impairment", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "PHYDIS", "Español": "Discapacidad física", "English": "Physical Disability", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "OTHERMED", "Español": "Otra condición médica", "English": "Other Medical Condition", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "PRTSDIED", "Español": "Padres fallecidos", "English": "Parents Deceased", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "PRTSJAIL", "Español": "Padres encarcelados", "English": "Parents Incarcerated", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "NOCOPE", "Español": "Padres sin recursos", "English": "Parents Unable to Cope", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "ABANDMNT", "Español": "Abandono", "English": "Abandonment", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "RELINQSH", "Español": "Entrega voluntaria", "English": "Relinquishment", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "HOUSING", "Español": "Falta de vivienda", "English": "Inadequate Housing", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "CASEGOAL", "Español": "Meta del caso", "English": "Case Goal", "Options": "1 = Reunify, 2 = Live with Relatives, 3 = Adoption, 4 = Long-Term Foster Care, 5 = Emancipation, 6 = Guardianship, 7 = Not Yet Established"},
+    {"Raw Name": "CURPLSET", "Español": "Colocación actual", "English": "Current Placement", "Options": "1 = Pre-Adoptive, 2 = Relative, 3 = Non-Relative, 4 = Group Home, 5 = Institution, 6 = Supervised Independent, 7 = Runaway, 8 = Trial Visit, 9 = Other"},
+    {"Raw Name": "PLACEOUT", "Español": "Retirado del hogar", "English": "Placed Out of Home", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "IsTPR", "Español": "TPR aplicado", "English": "TPR (Parental Rights Terminated)", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "IsWaiting", "Español": "Esperando adopción", "English": "Waiting for Adoption", "Options": "0 = No, 1 = Yes, 2 = Category 2"},
+    {"Raw Name": "IVEFC", "Español": "Elegible IV-E", "English": "IV-E Eligible", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "IVAAFDC", "Español": "Elegible IV-A/AFDC", "English": "IV-A/AFDC Eligible", "Options": "0 = No, 1 = Yes"},
+    {"Raw Name": "XIXMEDCD", "Español": "Elegible Medicaid", "English": "Medicaid Eligible", "Options": "0 = No, 1 = Yes"},
+]
+
+st.dataframe(pd.DataFrame(explanation_data))
+
