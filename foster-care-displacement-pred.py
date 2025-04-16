@@ -206,5 +206,6 @@ explanation_data = [
     {"Raw Name": "XIXMEDCD", "Español": "Elegible Medicaid", "English": "Medicaid Eligible", "Options": "0 = No, 1 = Yes"},
 ]
 
-st.dataframe(pd.DataFrame(explanation_data))
+st.dataframe(pd.DataFrame(explanation_data), use_container_width=True)
+
 
