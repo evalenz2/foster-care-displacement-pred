@@ -167,11 +167,11 @@ if submitted:
     'importance': np.abs(shap_values.values[0])
 }).sort_values(by='importance', ascending=False)
 
-fig, ax = plt.subplots(figsize=(10, 12))
-        ax.barh(shap_values_df['feature'], shap_values_df['importance'])
-ax.set_xlabel("SHAP Value (Impact)")
-ax.set_title("Feature Contributions to Prediction")
-ax.invert_yaxis()
+        fig, ax = plt.subplots(figsize=(10, 12))
+                ax.barh(shap_values_df['feature'], shap_values_df['importance'])
+        ax.set_xlabel("SHAP Value (Impact)")
+        ax.set_title("Feature Contributions to Prediction")
+        ax.invert_yaxis()
         st.pyplot()
 
         # Additional SHAP Plots
