@@ -160,10 +160,9 @@ if submitted:
         # SHAP Explanation
         st.subheader("Explanation of Prediction:")
         shap_values = explainer(user_df)
-        st.set_option("deprecation.showPyplotGlobalUse", False)
-        plt.figure(figsize=(10, 12))
-        shap.plots.bar(shap_values, max_display=len(feature_names), show=False)
-        st.pyplot()
+        fig, ax = plt.subplots()
+        shap.plots.waterfall(shap_values[0], show=False)
+        st.pyplot(fig)
 
     except Exception as e:
         st.error(f"Something went wrong: {e}")
